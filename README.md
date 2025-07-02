@@ -9,6 +9,9 @@
 - 编辑器支持根据AST以及附加的语义规则，遍历AST，生成LLvm IR
 - 编辑器支持连接到LLVM的后端，将前端得到的LLVM IR 交给后端生成目标平台的机器码。
 
+## 提交规范
+本项目采用 `Conventional Commits` 进行 commit message 的撰写。
+
 
 ## 附录
 ### 实验要求
