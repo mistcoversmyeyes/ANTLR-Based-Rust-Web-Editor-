@@ -1,5 +1,5 @@
 // Generated from RustParser.g4 by ANTLR 4.13.2
-package RustComplierFronted;
+package main.java.compiler.Core;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**

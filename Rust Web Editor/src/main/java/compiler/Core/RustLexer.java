@@ -1,5 +1,5 @@
 // Generated from RustLexer.g4 by ANTLR 4.13.2
-package RustComplierFronted;
+package main.java.compiler.Core;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;

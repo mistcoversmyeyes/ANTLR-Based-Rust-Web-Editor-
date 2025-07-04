@@ -1,4 +1,4 @@
-package RustAnalyser;
+package test.java;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
@@ -11,12 +11,14 @@ import java.awt.BorderLayout;
 
 // 确保这里的包名与你的 ANTLR 生成文件所在的包名一致
 // 如果你没有使用包，请删除下一行
-import RustComplierFronted.*;
+import main.java.compiler.*;
+import main.java.compiler.Core.RustLexer;
+import main.java.compiler.Core.RustParser;
 
 
-public class Main {
+public class CompilerFrontedTest {
     public static void main(String[] args) {
-        String rustFilePath = "Rust Web Editor/res/RustCode/hellow.rs"; // Rust 文件的相对路径
+        String rustFilePath = "Rust Web Editor/src/main/resources/RustCode/hellow.rs"; // Rust 文件的相对路径
 
         try {
             // 1. 创建一个 CharStream，从文件中读取字符
