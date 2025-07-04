@@ -16,7 +16,7 @@ import RustComplierFronted.*;
 
 public class Main {
     public static void main(String[] args) {
-        String rustFilePath = "res/RustCode/hellow.rs"; // Rust 文件的相对路径
+        String rustFilePath = "Rust Web Editor/res/RustCode/hellow.rs"; // Rust 文件的相对路径
 
         try {
             // 1. 创建一个 CharStream，从文件中读取字符
