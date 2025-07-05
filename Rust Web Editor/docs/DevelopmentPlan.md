@@ -5,7 +5,7 @@
 这个阶段的目标是完成 `README.md` 中要求的基础功能，将项目从一个本地分析器转变为一个功能完备的网页编辑器。
 
 1.  **搭建Web服务器**:
-    *   **任务**: 在 `RustAnalyser` 项目中集成一个轻量级的Java Web服务器（如 SparkJava, Javalin, or Spring Boot）。
+    *   **任务**: 在 `RustAnalyser` 项目中集成一个轻量级的Java Web服务器（Javalin）。
     *   **目的**: 创建一个API端点（例如 `/analyse`），使其能够接收来自网页前端的Rust代码字符串。
 
 2.  **创建Web编辑器前端**:
