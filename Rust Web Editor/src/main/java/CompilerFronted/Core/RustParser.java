@@ -1,5 +1,5 @@
 // Generated from RustParser.g4 by ANTLR 4.13.2
-package main.java.compiler.Core;
+package main.java.CompilerFronted.Core;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;

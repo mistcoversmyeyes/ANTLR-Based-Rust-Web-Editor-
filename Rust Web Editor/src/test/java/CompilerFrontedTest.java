@@ -9,11 +9,9 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 
-// 确保这里的包名与你的 ANTLR 生成文件所在的包名一致
-// 如果你没有使用包，请删除下一行
-import main.java.compiler.*;
-import main.java.compiler.Core.RustLexer;
-import main.java.compiler.Core.RustParser;
+import main.java.CompilerFronted.AnalysisService.models.TokenInfo;
+import main.java.CompilerFronted.Core.RustLexer;
+import main.java.CompilerFronted.Core.RustParser;
 
 
 public class CompilerFrontedTest {
@@ -35,13 +33,15 @@ public class CompilerFrontedTest {
 
             // 5. 调用语法的起始规则（对于 Rust 通常是 'crate'）来开始分析
             ParseTree tree = parser.crate();
-
-            // 6. (可选) 打印生成的分析树 (LISP-style)
+            
+            // 6. 打印 TokenInfo
+            for (Token token : tokens.getTokens()){
+                TokenInfo tokenInfo = new TokenInfo(token);
+            }
+            
+            // 7. 打印生成的分析树 (LISP-style)
             System.out.println("Parse Tree:");
             System.out.println(tree.toStringTree(parser));
-
-            // 7. 显示 GUI 树形视图
-            showTreeViewer(tree, parser);
 
             System.out.println("\nAnalysis finished successfully.");
             System.out.println("GUI tree viewer is now open. Close the window to exit.");

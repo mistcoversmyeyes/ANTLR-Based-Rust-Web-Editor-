@@ -1,4 +1,4 @@
-package main.java.compiler.Core;
+package main.java.CompilerFronted.Core;
 
 import org.antlr.v4.runtime.*;
 
