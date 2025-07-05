@@ -1,9 +1,9 @@
-package main.java.CompilerFronted.AnalysisService.models;
+package CompilerFronted.AnalysisService.models;
 
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.Vocabulary;
 
-import main.java.CompilerFronted.Core.RustParser;
+import CompilerFronted.Core.RustParser;
 
 public class TokenInfo {
     public String type;
@@ -23,4 +23,6 @@ public class TokenInfo {
     public String getText() { return text; }
     public int getLine() { return line; }
     public int getColumn() { return column; }
+
+    // toString
 }

@@ -1,7 +1,7 @@
-package main.java.WebServer;
+package WebServer;
 
 import io.javalin.Javalin;
-import main.java.CompilerFronted.AnalysisService.AnalysisService;
+import CompilerFronted.AnalysisService.*;
 
 public class WebServer {
     public static void main(String[] args) {

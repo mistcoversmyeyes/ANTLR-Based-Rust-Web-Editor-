@@ -1,9 +1,9 @@
-package main.java.CompilerFronted.AnalysisService.utils;
+package CompilerFronted.AnalysisService.utils;
 
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.Trees;
 
-import main.java.CompilerFronted.Core.RustParser;
+import CompilerFronted.Core.RustParser;
 
 public class DotGenerator {
     public static String generateDotString(ParseTree tree, RustParser parser) {

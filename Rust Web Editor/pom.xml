@@ -45,6 +45,10 @@
 
     <!-- 4. 构建配置：告诉 Maven 如何构建项目 -->
     <build>
+        <!-- 指定源代码目录 -->
+        <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+        <testSourceDirectory>${project.basedir}/src/test/java</testSourceDirectory>
+        
         <plugins>
             <!-- Maven Shade 插件：用于构建一个包含所有依赖的 "fat JAR" -->
             <plugin>
@@ -61,7 +65,7 @@
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <!-- 指定 JAR 的主入口类 -->
-                                    <mainClass>compiler.Main</mainClass>
+                                    <mainClass>main.java.WebServer.WebServer</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

@@ -1,4 +1,4 @@
-package main.java.CompilerFronted.AnalysisService.models;
+package CompilerFronted.AnalysisService.models;
 
 public class ParseTreeInfo {
     public String lisp;

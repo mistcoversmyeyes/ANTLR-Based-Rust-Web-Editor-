@@ -1,5 +1,3 @@
-package test.java;
-
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.gui.TreeViewer;
@@ -9,14 +7,14 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 
-import main.java.CompilerFronted.AnalysisService.models.TokenInfo;
-import main.java.CompilerFronted.Core.RustLexer;
-import main.java.CompilerFronted.Core.RustParser;
+import CompilerFronted.AnalysisService.models.TokenInfo;
+import CompilerFronted.Core.RustLexer;
+import CompilerFronted.Core.RustParser;
 
 
 public class CompilerFrontedTest {
     public static void main(String[] args) {
-        String rustFilePath = "Rust Web Editor/src/main/resources/RustCode/hellow.rs"; // Rust 文件的相对路径
+        String rustFilePath = "Rust Web Editor/res/RustCode/hellow.rs"; // Rust 文件的相对路径
 
         try {
             // 1. 创建一个 CharStream，从文件中读取字符
@@ -37,6 +35,7 @@ public class CompilerFrontedTest {
             // 6. 打印 TokenInfo
             for (Token token : tokens.getTokens()){
                 TokenInfo tokenInfo = new TokenInfo(token);
+                System.out.println(tokenInfo);
             }
             
             // 7. 打印生成的分析树 (LISP-style)

@@ -1,4 +1,4 @@
-package main.java.CompilerFronted.AnalysisService.models;
+package CompilerFronted.AnalysisService.models;
 
 import java.util.ArrayList;
 import java.util.List;

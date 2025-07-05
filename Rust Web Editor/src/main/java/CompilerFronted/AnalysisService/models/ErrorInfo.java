@@ -1,4 +1,4 @@
-package main.java.CompilerFronted.AnalysisService.models;
+package CompilerFronted.AnalysisService.models;
 
 public class ErrorInfo {
     public int line;

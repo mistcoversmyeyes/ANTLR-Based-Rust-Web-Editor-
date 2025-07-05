@@ -1,12 +1,12 @@
-package main.java.CompilerFronted.AnalysisService;
+package CompilerFronted.AnalysisService;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import main.java.CompilerFronted.AnalysisService.models.*;
-import main.java.CompilerFronted.AnalysisService.utils.DotGenerator;
-import main.java.CompilerFronted.Core.RustLexer;
-import main.java.CompilerFronted.Core.RustParser;
+import CompilerFronted.AnalysisService.models.*;
+import CompilerFronted.AnalysisService.utils.DotGenerator;
+import CompilerFronted.Core.RustLexer;
+import CompilerFronted.Core.RustParser;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
