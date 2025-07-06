@@ -51,7 +51,7 @@ class RustWebEditor {
             await this.initializeEditor();
             
             // 初始化可视化器
-            this.initializeVisualizer();
+            await this.initializeVisualizer();
             
             // 设置事件监听
             this.setupEventListeners();
@@ -95,9 +95,19 @@ class RustWebEditor {
     /**
      * 初始化可视化器
      */
-    initializeVisualizer() {
+    async initializeVisualizer() {
+        console.log('检查 Visualizer 对象:', window.Visualizer);
+        
+        if (!window.Visualizer) {
+            throw new Error('Visualizer 模块未加载');
+        }
+        
+        if (!window.Visualizer.resultVisualizer) {
+            throw new Error('resultVisualizer 实例未创建');
+        }
+        
         this.visualizer = window.Visualizer.resultVisualizer;
-        this.visualizer.initialize();
+        await this.visualizer.initialize();
         
         console.log('可视化器初始化完成');
     }
@@ -171,6 +181,20 @@ class RustWebEditor {
                 this.loadExample();
             });
         }
+
+        // 测试图形渲染（临时调试功能）
+        const testGraphBtn = document.createElement('button');
+        testGraphBtn.textContent = '测试图形';
+        testGraphBtn.className = 'btn btn-secondary';
+        testGraphBtn.style.display = 'none'; // 默认隐藏，可在控制台显示
+        testGraphBtn.onclick = () => this.testGraphRendering();
+        document.body.appendChild(testGraphBtn);
+        
+        // 在控制台暴露测试函数
+        window.testGraph = () => {
+            testGraphBtn.style.display = 'inline-block';
+            this.testGraphRendering();
+        };
 
         // 主题选择
         const themeSelect = Utils.DOM.id('themeSelect');
@@ -626,6 +650,30 @@ class RustWebEditor {
 
         this.isInitialized = false;
         console.log('应用已销毁');
+    }
+
+    /**
+     * 测试图形渲染（调试用）
+     */
+    testGraphRendering() {
+        console.log('开始测试图形渲染...');
+        
+        // 使用一个简单的 DOT 图进行测试
+        const simpleDot = `digraph G {
+    A -> B;
+    B -> C;
+    C -> A;
+}`;
+        
+        console.log('测试 DOT 字符串:', simpleDot);
+        
+        try {
+            this.visualizer.graphRenderer.renderGraph(simpleDot, 'parseTreeViz');
+            Utils.Notification.info('测试图形渲染已启动，请查看解析树标签页');
+        } catch (error) {
+            console.error('测试图形渲染失败:', error);
+            Utils.Notification.error('测试图形渲染失败: ' + error.message);
+        }
     }
 }
 

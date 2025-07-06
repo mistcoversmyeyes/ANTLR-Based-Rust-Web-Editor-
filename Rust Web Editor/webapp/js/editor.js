@@ -115,12 +115,16 @@ class RustEditor {
                 return;
             }
 
-            // 设置Monaco路径
-            require.config({
-                paths: {
-                    'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs'
-                }
-            });
+            // 检查是否已经配置过require（避免重复配置）
+            if (!window.monacoConfigured) {
+                // 设置Monaco路径
+                require.config({
+                    paths: {
+                        'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs'
+                    }
+                });
+                window.monacoConfigured = true;
+            }
 
             // 加载Monaco Editor
             require(['vs/editor/editor.main'], () => {

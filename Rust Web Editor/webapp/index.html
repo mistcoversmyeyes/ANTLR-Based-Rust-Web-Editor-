@@ -13,9 +13,88 @@
     <!-- Monaco Editor -->
     <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
     
-    <!-- Viz.js for Graphviz visualization -->
-    <script src="https://cdn.jsdelivr.net/npm/@hpcc-js/wasm@2.5.0/dist/graphviz.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <!-- Viz.js for Graphviz visualization - 避免AMD冲突 -->
+    <script>
+        // 暂时禁用AMD以避免与Monaco冲突
+        window.oldDefine = window.define;
+        window.define = undefined;
+    </script>
+    <script src="https://unpkg.com/viz.js@2.1.2/viz.js"></script>
+    <script src="https://unpkg.com/viz.js@2.1.2/full.render.js"></script>
+    <script>
+        // 恢复AMD
+        window.define = window.oldDefine;
+        delete window.oldDefine;
+    </script>
+    
+    <!-- 确保 Viz.js 正确加载 -->
+    <script>
+        // 检查 Viz.js 是否加载成功
+        window.addEventListener('load', function() {
+            console.log('页面加载完成，检查 Viz.js 状态：', typeof Viz !== 'undefined' ? 'OK' : '未加载');
+            if (typeof Viz !== 'undefined') {
+                console.log('Viz 对象：', Viz);
+                window.VizLoaded = true;
+            } else {
+                console.error('Viz.js 加载失败，将尝试动态加载');
+                window.VizLoaded = false;
+            }
+        });
+    </script>
+    
+    <!-- 备用方案：直接内联加载 -->
+    <script>
+        // 确保 Viz.js 正确加载的备用方案
+        window.ensureVizLoaded = function() {
+            return new Promise((resolve, reject) => {
+                if (typeof Viz !== 'undefined') {
+                    console.log('Viz.js 已经加载');
+                    resolve();
+                    return;
+                }
+                
+                console.log('动态加载 Viz.js...');
+                
+                // 暂时禁用AMD以避免冲突
+                const oldDefine = window.define;
+                window.define = undefined;
+                
+                const script1 = document.createElement('script');
+                script1.src = 'https://unpkg.com/viz.js@2.1.2/viz.js';
+                script1.onload = function() {
+                    console.log('Viz.js 主文件加载完成');
+                    const script2 = document.createElement('script');
+                    script2.src = 'https://unpkg.com/viz.js@2.1.2/full.render.js';
+                    script2.onload = function() {
+                        console.log('Viz.js 渲染器加载完成');
+                        
+                        // 恢复AMD
+                        window.define = oldDefine;
+                        
+                        // 等待一下确保全局变量可用
+                        setTimeout(() => {
+                            if (typeof Viz !== 'undefined') {
+                                console.log('Viz.js 动态加载成功');
+                                resolve();
+                            } else {
+                                reject(new Error('Viz.js 加载后仍不可用'));
+                            }
+                        }, 100);
+                    };
+                    script2.onerror = (error) => {
+                        window.define = oldDefine;
+                        reject(error);
+                    };
+                    document.head.appendChild(script2);
+                };
+                script1.onerror = (error) => {
+                    window.define = oldDefine;
+                    reject(error);
+                };
+                document.head.appendChild(script1);
+            });
+        };
+    </script>
 </head>
 <body>
     <!-- 头部区域 -->
