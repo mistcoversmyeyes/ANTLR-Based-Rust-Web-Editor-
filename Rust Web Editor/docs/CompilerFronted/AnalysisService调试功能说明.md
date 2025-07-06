@@ -59,26 +59,8 @@
 
 ## 控制调试功能
 
-### 启用调试（默认）
-无需任何配置，调试功能默认启用。
-
-### 禁用调试
-通过设置系统属性来禁用：
-
-**方法1：运行时设置**
-```bash
-java -Danalysis.debug=false YourMainClass
-```
-
-**方法2：Maven 测试时禁用**
-```bash
-mvn test -Danalysis.debug=false
-```
-
-**方法3：在 IDE 中设置 VM 选项**
-```
--Danalysis.debug=false
-```
+### 唯一方法
+手动在 `AnalysisService.java` 中设置 `DEBUG_MODE` 为true/false
 
 ## 用途
 1. **开发调试**：查看词法分析和语法分析的详细结果
