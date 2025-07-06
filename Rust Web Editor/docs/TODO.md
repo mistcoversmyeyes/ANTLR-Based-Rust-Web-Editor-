@@ -6,8 +6,8 @@
 - [ ] `antlr4` 根据语法文件生成的 Scanner 和 Parser 的代码的结构拆解文档
 - [ ] 根据结构拆解文档，探索如何利用生成的 Scanner 和 Parser 进行
 - [x] 编辑器前端搭建框架选择 与 框架介绍
-- [ ] 前端开发环境搭建文档
-- [ ] 前端 API 调用与数据格式说明文档
+- [x] 前端开发环境搭建文档
+- [x] 前端 API 调用与数据格式说明文档
 - [ ] 前端结果可视化实现说明文档
 
 # 程序功能实现
@@ -18,47 +18,51 @@
   - [x] 定义分析结果的 JSON 数据结构 (Token, .dot格式的ParseTree, Errors)
   - [x] 将antlr解析逻辑封装为 `AnalysisService` 类，这个类应当为webserver提供对于输入的Rust源代码的词法和语法分析，包含报错信息和成功分析的部分。
     - [x] 添加JSON调试输出功能，便于开发调试
-  - [ ] 在 `WebServer` 中调用 `AnalysisService`，处理来自前端的代码
+  - [x] 在 `WebServer` 中调用 `AnalysisService`，处理来自前端的代码
 
 ### 创建Web编辑器前端
-- [ ] 3.1 创建前端项目结构
-  - [ ] 创建 `webapp` 目录
-  - [ ] 设置基础文件结构（HTML、CSS、JS）
-  - [ ] 引入 Monaco Editor 和 viz.js 依赖
-  - [ ] 配置项目的基本文件组织
-- [ ] 3.2 实现代码编辑器界面
-  - [ ] 集成 Monaco Editor
-  - [ ] 配置 Rust 语法高亮
-  - [ ] 设置编辑器主题和基本配置
-  - [ ] 测试编辑器基本功能
-- [ ] 3.3 创建用户界面布局
-  - [ ] 设计整体页面布局（编辑器 + 结果展示区域）
-  - [ ] 添加"分析"按钮和加载状态
-  - [ ] 创建 TokenStream 结果展示区域
-  - [ ] 创建 ParseTree/AST 可视化区域
-  - [ ] 创建错误信息展示区域
-  - [ ] 实现响应式布局
-- [ ] 3.4 实现与后端的通信
-  - [ ] 编写 API 调用函数
-  - [ ] 处理请求/响应的数据格式
-  - [ ] 添加错误处理和用户反馈
-  - [ ] 实现加载状态管理
+- [x] 3.1 创建前端项目结构
+  - [x] 创建 `webapp` 目录
+  - [x] 设置基础文件结构（HTML、CSS、JS）
+  - [x] 引入 Monaco Editor 和 viz.js 依赖
+  - [x] 配置项目的基本文件组织
+- [x] 3.2 实现代码编辑器界面
+  - [x] 集成 Monaco Editor
+  - [x] 配置 Rust 语法高亮
+  - [x] 设置编辑器主题和基本配置
+  - [x] 测试编辑器基本功能
+- [x] 3.3 创建用户界面布局
+  - [x] 设计整体页面布局（编辑器 + 结果展示区域）
+  - [x] 添加"分析"按钮和加载状态
+  - [x] 创建 TokenStream 结果展示区域
+  - [x] 创建 ParseTree/AST 可视化区域
+  - [x] 创建错误信息展示区域
+  - [x] 实现响应式布局
+- [x] 3.4 实现与后端的通信
+  - [x] 编写 API 调用函数
+  - [x] 处理请求/响应的数据格式
+  - [x] 添加错误处理和用户反馈
+  - [x] 实现加载状态管理
 
 ### 实现结果的可视化
-- [ ] 4.1 TokenStream 展示
-  - [ ] 设计 Token 列表的展示格式（表格形式）
-  - [ ] 实现 JSON 数据到前端展示的转换
-  - [ ] 添加 Token 信息的详细展示（类型、值、位置等）
-- [ ] 4.2 ParseTree/AST 可视化
-  - [ ] 集成 viz.js 库
-  - [ ] 实现 .dot 字符串到图形的渲染
+- [x] 4.1 TokenStream 展示
+  - [x] 设计 Token 列表的展示格式（表格形式）
+  - [x] 实现 JSON 数据到前端展示的转换
+  - [x] 添加 Token 信息的详细展示（类型、值、位置等）
+- [x] 4.2 ParseTree/AST 可视化
+  - [x] 集成 viz.js 库
+  - [x] 修复 AMD 模块冲突问题（Monaco Editor 与 Viz.js 兼容性）
+  - [x] 实现 Viz.js 正确加载和初始化
+  - [ ] **[需修复]** 后端 DOT 字符串生成问题：字符串字面量转义错误
+  - [ ] 实现 .dot 字符串到图形的渲染（待后端修复后验证）
   - [ ] 添加图形的缩放、拖拽等交互功能
   - [ ] 优化大型语法树的显示性能
-- [ ] 4.3 错误信息展示
-  - [ ] 设计错误信息的展示界面
-  - [ ] 实现代码行的错误高亮
-  - [ ] 创建错误列表面板
-  - [ ] 实现错误信息与代码位置的联动
+- [x] 4.3 错误信息展示
+  - [x] 设计错误信息的展示界面
+  - [x] 实现代码行的错误高亮
+  - [x] 创建错误列表面板
+  - [x] 实现错误信息与代码位置的联动
+  - [x] 修复 ErrorRenderer 类创建问题
 
 ### 用户体验优化
 - [ ] 基本样式与布局美化
@@ -95,5 +99,46 @@
 
 
 
+## 已识别问题与修复状态
+
+### 前端问题
+- [x] **Monaco Editor 与 Viz.js AMD 冲突**
+  - 问题：Monaco Editor 的 AMD 加载器与 Viz.js 产生冲突，导致 "Can only have one anonymous define call per script file" 错误
+  - 解决方案：在加载 Viz.js 时暂时禁用 AMD，加载完成后恢复
+  - 状态：已修复
+
+- [x] **错误信息渲染失败**
+  - 问题：`Utils.DOM.create('div', 'error-item')` 传递字符串作为 attributes 参数导致 "Failed to execute 'setAttribute'" 错误
+  - 解决方案：修改为 `Utils.DOM.create('div', { className: 'error-item' })` 并增强 create 方法支持字符串参数
+  - 状态：已修复
+
+- [x] **可视化模块初始化问题**
+  - 问题：缺少 ErrorRenderer 类定义和渲染器初始化导致应用启动失败
+  - 解决方案：添加完整的 ErrorRenderer 类并在 ResultVisualizer 中正确初始化所有渲染器
+  - 状态：已修复
+
+### 后端问题
+- [ ] **DOT 字符串格式错误 - 字符串字面量转义**
+  - 问题：后端生成的 DOT 字符串中字符串字面量转义不正确
+  - 具体示例：`node12 [label=""Hello, world!""];` 应为 `node12 [label="\"Hello, world!\""];`
+  - 影响：导致 Graphviz 解析失败，解析树无法可视化
+  - 状态：**需修复后端 AnalysisService 中的 DOT 生成逻辑**
+  - 参考文档：`./CompilerFronted/DOT格式生成问题分析.md` 和 `./CompilerFronted/AnalysisService DOT修复指南.md`
+
+- [ ] **DOT 字符串格式错误 - 特殊字符转义**
+  - 问题：DOT 节点标签中的特殊字符（换行符、制表符、反斜杠等）未正确转义
+  - 影响：可能导致解析失败或显示异常
+  - 状态：需在修复字符串字面量问题时一并解决
+
+### 验证方法
+- [x] 使用命令行 Graphviz 工具验证 DOT 文件格式：`dot -Tsvg test.dot -o test.svg`
+- [x] 前端修复可通过 `debugViz.checkViz()` 和 `debugViz.analyzeDot()` 进行调试
+- [x] 通过手动修复 DOT 文件验证格式正确性
+- [x] 确认问题源头为后端 DOT 生成，前端无需修复 DOT 格式
+
+
 # 参考
-[1]: ./CompilerFronted/AnalysisService调试功能说明.md
+[1]: ./CompilerFronted/AnalysisService调试功能说明.md  
+[2]: ./CompilerFronted/DOT格式生成问题分析.md  
+[3]: ./CompilerFronted/AnalysisService%20DOT修复指南.md  
+[4]: ./webapp/前端开发指南.md 
