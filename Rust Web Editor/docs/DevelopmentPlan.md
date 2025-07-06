@@ -8,19 +8,44 @@
     *   **任务**: 在 `RustAnalyser` 项目中集成一个轻量级的Java Web服务器（Javalin）。
     *   **目的**: 创建一个API端点（例如 `/analyse`），使其能够接收来自网页前端的Rust代码字符串。
 
-2.  **创建Web编辑器前端**:
-    *   **任务**: 创建一个新的 `webapp` 或 `frontend` 目录，在其中编写 HTML, CSS, 和 JavaScript 代码。
-    *   **目的**: 构建一个用户界面，包含一个代码输入框（可以使用 CodeMirror 或 Monaco Editor 增强体验）和一个“分析”按钮。当用户点击按钮时，通过 `fetch` API 将代码发送到后端的 `/analyse` 端点。
-
-3.  **实现结果的可视化**:
-    *   **TokenStream**: 修改后端逻辑，使其返回一个包含所有Token的列表（JSON格式），并在前端以文本形式展示。
-    *   **ParseTree/AST (使用Graphviz)**:
-        *   后端：编写一个访问者（Visitor）或监听器（Listener）来遍历ANTLR生成的解析树，并生成符合Graphviz要求的 `.dot` 文件格式的字符串。
-        *   前端：接收到 `.dot` 字符串后，使用 `viz.js` (Graphviz的JavaScript移植版) 在浏览器中直接渲染出图形。
-
-4.  **构建完整的错误处理机制**:
+2.  **构建完整的错误处理机制**:
     *   **任务**: 实现ANTLR的 `ANTLRErrorListener` 接口。
     *   **目的**: 捕获词法/语法分析过程中产生的错误，收集错误信息（如行号、列号、错误消息），并将其以清晰的格式（如JSON）返回给前端，在编辑器中高亮显示或在单独的面板中列出。
+    
+3.  **创建Web编辑器前端**:
+    *   **技术选型**: 使用原生 JavaScript + Monaco Editor + viz.js
+    *   **任务细化**:
+        *   3.1 **创建前端项目结构**: 创建 `webapp` 目录，设置基础文件结构（HTML、CSS、JS），引入 Monaco Editor 和 viz.js 依赖
+        *   3.2 **实现代码编辑器界面**: 集成 Monaco Editor，配置 Rust 语法高亮，设置编辑器主题和基本配置
+        *   3.3 **创建用户界面布局**: 设计整体页面布局（编辑器 + 结果展示区域），添加"分析"按钮和加载状态，创建结果展示的各个区域
+        *   3.4 **实现与后端的通信**: 编写 API 调用函数，处理请求/响应的数据格式，添加错误处理和用户反馈
+    *   **目录结构**:
+        ```
+        webapp/
+        ├── index.html          # 主页面
+        ├── css/
+        │   └── styles.css      # 样式文件
+        ├── js/
+        │   ├── main.js         # 主逻辑
+        │   ├── editor.js       # 编辑器相关
+        │   ├── api.js          # API 调用
+        │   └── visualizer.js   # 结果可视化
+        └── lib/                # 第三方库
+            ├── monaco-editor/
+            └── viz.js
+        ```
+
+4.  **实现结果的可视化**:
+    *   **任务细化**:
+        *   4.1 **TokenStream 展示**: 设计 Token 列表的展示格式（表格或列表），实现 JSON 数据到前端展示的转换
+        *   4.2 **ParseTree/AST 可视化**: 集成 viz.js 库，实现 .dot 字符串到图形的渲染，添加图形的缩放、拖拽等交互功能
+        *   4.3 **错误信息展示**: 设计错误信息的展示界面，实现代码行的错误高亮，创建错误列表面板
+    *   **技术实现**:
+        *   **TokenStream**: 修改后端逻辑，使其返回一个包含所有Token的列表（JSON格式），并在前端以表格形式展示
+        *   **ParseTree/AST (使用Graphviz)**:
+            *   后端：编写一个访问者（Visitor）或监听器（Listener）来遍历ANTLR生成的解析树，并生成符合Graphviz要求的 `.dot` 文件格式的字符串
+            *   前端：接收到 `.dot` 字符串后，使用 `viz.js` (Graphviz的JavaScript移植版) 在浏览器中直接渲染出图形
+
 
 ## 第二阶段：语义分析与LLVM IR生成 (选做加分项)
 
