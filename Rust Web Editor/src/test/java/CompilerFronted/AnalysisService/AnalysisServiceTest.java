@@ -8,12 +8,30 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.List;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class AnalysisServiceTest {
 
+    /**
+     * 读取资源文件内容的辅助方法
+     * @param fileName 文件名
+     * @return 文件内容
+     */
+    private String readRustCodeFromFile(String fileName) {
+        try {
+            String filePath = "res/RustCode/" + fileName;
+            return Files.readString(Paths.get(filePath));
+        } catch (IOException e) {
+            fail("Failed to read file: " + fileName + ", error: " + e.getMessage());
+            return null;
+        }
+    }
+
     @Test
     void testAnalyseWithValidRustCode() {
-        String rustCode = "fn main() {\n    println!(\"Hello, world!\");\n}";
+        String rustCode = readRustCodeFromFile("hellow.rs");
         String jsonResult = AnalysisService.analyse(rustCode);
 
         assertNotNull(jsonResult, "JSON result should not be null");
@@ -44,7 +62,7 @@ public class AnalysisServiceTest {
 
     @Test
     void testAnalyseWithInvalidRustCode() {
-        String rustCode = "fn main() {\n    println!(\"Hello, world!\"\n}"; // Missing closing parenthesis
+        String rustCode = readRustCodeFromFile("hellow_error.rs");
         String jsonResult = AnalysisService.analyse(rustCode);
 
         assertNotNull(jsonResult, "JSON result should not be null");
