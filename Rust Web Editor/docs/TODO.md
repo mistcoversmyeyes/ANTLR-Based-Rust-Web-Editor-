@@ -53,8 +53,9 @@
   - [x] 集成 viz.js 库
   - [x] 修复 AMD 模块冲突问题（Monaco Editor 与 Viz.js 兼容性）
   - [x] 实现 Viz.js 正确加载和初始化
-  - [ ] **[需修复]** 后端 DOT 字符串生成问题：字符串字面量转义错误
-  - [ ] 实现 .dot 字符串到图形的渲染（待后端修复后验证）
+  - [x] **[已修复]** 后端 DOT 字符串生成问题：字符串字面量转义错误
+  - [x] **[已修复]** 后端 DOT 生成核心问题：节点ID重复分配导致解析树结构错误
+  - [x] 实现 .dot 字符串到图形的渲染
   - [ ] 添加图形的缩放、拖拽等交互功能
   - [ ] 优化大型语法树的显示性能
 - [x] 4.3 错误信息展示
@@ -118,27 +119,48 @@
   - 状态：已修复
 
 ### 后端问题
-- [ ] **DOT 字符串格式错误 - 字符串字面量转义**
+- [x] **DOT 字符串格式错误 - 字符串字面量转义**
   - 问题：后端生成的 DOT 字符串中字符串字面量转义不正确
   - 具体示例：`node12 [label=""Hello, world!""];` 应为 `node12 [label="\"Hello, world!\""];`
   - 影响：导致 Graphviz 解析失败，解析树无法可视化
-  - 状态：**需修复后端 AnalysisService 中的 DOT 生成逻辑**
-  - 参考文档：`./CompilerFronted/DOT格式生成问题分析.md` 和 `./CompilerFronted/AnalysisService DOT修复指南.md`
+  - 状态：**已修复** - 在 DotGenerator 重写时一并解决
+  - 参考文档：`./CompilerFronted/DOT格式生成问题分析.md`
 
-- [ ] **DOT 字符串格式错误 - 特殊字符转义**
+- [x] **DOT 节点ID重复分配问题**
+  - 问题：DOT 生成算法中存在节点ID重复分配，导致解析树结构完全错误
+  - 具体表现：同一个nodeID被多个不同节点使用，连接关系混乱
+  - 影响：渲染出的解析树与标准ANTLR输出完全不符
+  - 状态：**已修复** - 完全重写 DotGenerator 类，使用全局ID计数器
+  - 参考文档：`./CompilerFronted/DOT生成器节点ID重复问题修复报告.md`
+
+- [x] **DOT 字符串格式错误 - 特殊字符转义**
   - 问题：DOT 节点标签中的特殊字符（换行符、制表符、反斜杠等）未正确转义
   - 影响：可能导致解析失败或显示异常
-  - 状态：需在修复字符串字面量问题时一并解决
+  - 状态：**已修复** - 在DotGenerator重写时改进了转义逻辑
 
 ### 验证方法
 - [x] 使用命令行 Graphviz 工具验证 DOT 文件格式：`dot -Tsvg test.dot -o test.svg`
 - [x] 前端修复可通过 `debugViz.checkViz()` 和 `debugViz.analyzeDot()` 进行调试
 - [x] 通过手动修复 DOT 文件验证格式正确性
 - [x] 确认问题源头为后端 DOT 生成，前端无需修复 DOT 格式
+- [x] **新增验证** - 重写后的DotGenerator确保节点ID唯一性和正确的解析树结构
 
 
 # 参考
 [1]: ./CompilerFronted/AnalysisService调试功能说明.md  
 [2]: ./CompilerFronted/DOT格式生成问题分析.md  
 [3]: ./CompilerFronted/AnalysisService%20DOT修复指南.md  
-[4]: ./webapp/前端开发指南.md 
+[4]: ./webapp/前端开发指南.md  
+[5]: ./CompilerFronted/DOT生成器节点ID重复问题修复报告.md
+
+## 最近完成的工作
+
+### 2025-07-07: DOT生成器重大修复
+- **问题**: 解析树可视化显示错误的图形结构，与标准ANTLR输出不符
+- **根因**: DotGenerator中节点ID重复分配，递归算法存在严重缺陷
+- **解决方案**: 完全重写DotGenerator类，引入全局ID计数器，简化递归逻辑
+- **影响**: 修复了解析树可视化的核心功能，现在能正确显示解析树结构
+- **文件**: 
+  - 修复代码: `src/main/java/CompilerFronted/AnalysisService/utils/DotGenerator.java`
+  - 修复报告: `docs/CompilerFronted/DOT生成器节点ID重复问题修复报告.md`
+- **状态**: ✅ 已完成，待下次启动服务验证 
