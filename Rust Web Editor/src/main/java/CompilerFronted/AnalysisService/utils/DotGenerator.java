@@ -149,10 +149,10 @@ public class DotGenerator {
      */
     private static String getNodeStyle(ParseTree tree) {
         if (tree instanceof TerminalNode) {
-            // 终端节点使用矩形，浅绿色填充
-            return ", shape=box, fillcolor=lightgreen";
+            // 终端节点（终结符）：黄色方形
+            return ", shape=box, style=filled, fillcolor=yellow";
         } else {
-            // 非终端节点使用椭圆，浅蓝色填充（默认样式）
+            // 非终端节点：蓝色椭圆（使用全局默认样式）
             return "";
         }
     }
