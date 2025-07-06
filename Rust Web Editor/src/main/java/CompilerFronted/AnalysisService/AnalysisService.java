@@ -22,7 +22,8 @@ import java.util.List;
 
 public class AnalysisService {
     // 调试开关：设置为 true 时会保存分析结果到文件
-    private static final boolean DEBUG_MODE = Boolean.parseBoolean(System.getProperty("analysis.debug", "true"));
+    // private static final boolean DEBUG_MODE = Boolean.parseBoolean(System.getProperty("analysis.debug", "true"));
+    private static final boolean DEBUG_MODE = false;
     
     /**
      * 接收 Rust 代码字符串，执行词法和语法分析，并返回分析结果的JSON字符串。
