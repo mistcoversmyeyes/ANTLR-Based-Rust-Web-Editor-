@@ -12,8 +12,9 @@
 ## 第一阶段：完善核心前端功能 (Web编辑器)
 - [x] 搭建Web服务器
   - [x] 创建基础的 `WebServer.java` 并引入 Javalin
-  - [ ] 定义分析结果的 JSON 数据结构 (Token, .dot格式的ParseTree, Errors)
-  - [ ] 将原有的 ANTLR 解析逻辑封装成一个独立的 `AnalysisService` 类
+  - [x] 定义分析结果的 JSON 数据结构 (Token, .dot格式的ParseTree, Errors)
+  - [x] 将antlr解析逻辑封装为 `AnalysisService` 类，这个类应当为webserver提供对于输入的Rust源代码的词法和语法分析，包含报错信息和成功分析的部分。
+    - [x] 添加JSON调试输出功能，便于开发调试
   - [ ] 在 `WebServer` 中调用 `AnalysisService`，处理来自前端的代码
 - [ ] 创建Web编辑器前端
 - [ ] 实现结果的可视化
