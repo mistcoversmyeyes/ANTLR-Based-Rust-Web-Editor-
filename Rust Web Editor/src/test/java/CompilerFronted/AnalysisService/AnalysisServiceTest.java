@@ -44,7 +44,7 @@ public class AnalysisServiceTest {
 
     @Test
     void testAnalyseWithInvalidRustCode() {
-        String rustCode = "fn main() {\n    println!(\"Hello, world!\")\n}"; // Missing semicolon
+        String rustCode = "fn main() {\n    println!(\"Hello, world!\"\n}"; // Missing closing parenthesis
         String jsonResult = AnalysisService.analyse(rustCode);
 
         assertNotNull(jsonResult, "JSON result should not be null");
