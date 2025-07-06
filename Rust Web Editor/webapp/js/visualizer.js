@@ -831,7 +831,7 @@ class ErrorRenderer {
      * 创建错误元素
      */
     createErrorElement(error, index) {
-        const errorDiv = Utils.DOM.create('div', 'error-item');
+        const errorDiv = Utils.DOM.create('div', { className: 'error-item' });
         
         errorDiv.innerHTML = `
             <div class="error-header">
