@@ -82,7 +82,7 @@ public class AnalysisService {
             
             // 11. 保存调试结果到文件（可选）
             if (DEBUG_MODE) {
-                saveDebugResult(rustCode, jsonResult);
+                saveDebugResult(rustCode, result);
             }
             
             return jsonResult;
@@ -94,7 +94,7 @@ public class AnalysisService {
             e.printStackTrace();
             String jsonResult = gson.toJson(result);
             if (DEBUG_MODE) {
-                saveDebugResult(rustCode, jsonResult);
+                saveDebugResult(rustCode, result);
             }
             return jsonResult;
         }
@@ -104,9 +104,9 @@ public class AnalysisService {
      * 保存分析结果到 JSON 文件以便调试
      * 
      * @param rustCode 原始 Rust 代码
-     * @param jsonResult 分析结果的 JSON 字符串
+     * @param analysisResult 分析结果对象
      */
-    private static void saveDebugResult(String rustCode, String jsonResult) {
+    private static void saveDebugResult(String rustCode, AnalysisResult analysisResult) {
         try {
             // 创建调试输出目录
             Path debugDir = Paths.get("debug_output");
@@ -116,22 +116,35 @@ public class AnalysisService {
             
             // 生成带时间戳的文件名
             String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss-SSS"));
-            String fileName = "analysis_result_" + timestamp + ".json";
-            Path filePath = debugDir.resolve(fileName);
             
-            // 创建包含源代码和分析结果的完整调试信息
+            // 保存完整的调试信息到主文件
+            String debugFileName = "debug_" + timestamp + ".json";
+            Path debugFilePath = debugDir.resolve(debugFileName);
+            
             DebugInfo debugInfo = new DebugInfo();
             debugInfo.timestamp = timestamp;
             debugInfo.sourceCode = rustCode;
-            debugInfo.analysisResult = jsonResult;
+            debugInfo.analysisResult = analysisResult;  // 直接保存对象，不是字符串
             
-            // 将调试信息写入文件
+            // 保存分析结果到独立文件
+            String resultFileName = "analysis_result_" + timestamp + ".json";
+            Path resultFilePath = debugDir.resolve(resultFileName);
+            
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            try (FileWriter writer = new FileWriter(filePath.toFile())) {
+            
+            // 写入完整调试信息
+            try (FileWriter writer = new FileWriter(debugFilePath.toFile())) {
                 gson.toJson(debugInfo, writer);
             }
             
-            System.out.println("Debug result saved to: " + filePath.toAbsolutePath());
+            // 写入纯分析结果（更易阅读）
+            try (FileWriter writer = new FileWriter(resultFilePath.toFile())) {
+                gson.toJson(analysisResult, writer);
+            }
+            
+            System.out.println("Debug files saved:");
+            System.out.println("  Full debug info: " + debugFilePath.toAbsolutePath());
+            System.out.println("  Analysis result: " + resultFilePath.toAbsolutePath());
             
         } catch (IOException e) {
             System.err.println("Failed to save debug result: " + e.getMessage());
@@ -144,6 +157,6 @@ public class AnalysisService {
     private static class DebugInfo {
         public String timestamp;
         public String sourceCode;
-        public String analysisResult;
+        public AnalysisResult analysisResult;  // 现在直接存储对象而不是字符串
     }
 }

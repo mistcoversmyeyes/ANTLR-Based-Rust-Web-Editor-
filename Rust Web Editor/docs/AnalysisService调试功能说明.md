@@ -13,16 +13,49 @@
 4. **可控开关**：支持通过系统属性控制是否启用调试功能
 
 ## 输出文件格式
+
+现在会生成两个文件以提供不同层次的调试信息：
+
+### 1. 纯分析结果文件 (`analysis_result_*.json`)
+包含纯净的分析结果，便于直接查看和分析：
 ```json
 {
-  "timestamp": "2025-07-06_12-48-33-708",
+  "success": true,
+  "tokens": [
+    {
+      "type": "KW_FN",
+      "text": "fn",
+      "line": 1,
+      "column": 0
+    }
+    // ... 更多 tokens
+  ],
+  "parseTree": {
+    "lisp": "语法树的LISP表示",
+    "dot": "语法树的DOT格式（用于Graphviz可视化）"
+  },
+  "errors": []
+}
+```
+
+### 2. 完整调试信息文件 (`debug_*.json`)
+包含时间戳、源代码和分析结果的完整信息：
+```json
+{
+  "timestamp": "2025-07-06_14-31-31-980",
   "sourceCode": "fn main() {\n    println!(\"Hello, world!\");\n}",
-  "analysisResult": "{ JSON格式的完整分析结果 }"
+  "analysisResult": {
+    // 与 analysis_result_*.json 内容相同
+  }
 }
 ```
 
 ## 文件位置
 调试文件保存在项目根目录下的 `debug_output/` 文件夹中。
+
+每次分析会生成两个文件：
+- `analysis_result_YYYY-MM-DD_HH-mm-ss-SSS.json` - 纯分析结果
+- `debug_YYYY-MM-DD_HH-mm-ss-SSS.json` - 完整调试信息
 
 ## 控制调试功能
 
@@ -52,6 +85,8 @@ mvn test -Danalysis.debug=false
 2. **测试验证**：保存测试案例的分析结果供后续对比
 3. **问题排查**：分析错误代码的处理过程
 4. **性能分析**：通过时间戳分析处理耗时
+5. **可视化支持**：`analysis_result_*.json` 文件可直接用于前端展示
+6. **数据分析**：JSON格式便于程序化处理和统计分析
 
 ## 注意事项
 1. 调试文件会持续累积，建议定期清理 `debug_output/` 目录
