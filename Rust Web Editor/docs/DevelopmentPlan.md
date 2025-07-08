@@ -38,13 +38,16 @@
 4.  **实现结果的可视化**:
     *   **任务细化**:
         *   4.1 **TokenStream 展示**: 设计 Token 列表的展示格式（表格或列表），实现 JSON 数据到前端展示的转换
-        *   4.2 **ParseTree/AST 可视化**: 集成 viz.js 库，实现 .dot 字符串到图形的渲染，添加图形的缩放、拖拽等交互功能
+        *   4.2 **ParseTree（CST）和 AST 可视化**: 
+            *   **ParseTree（CST）可视化**：后端遍历ANTLR生成的ParseTree，输出LISP树和Graphviz `.dot` 字符串，前端用viz.js渲染为交互式语法树，完整反映源代码的语法结构。
+            *   **AST（抽象语法树）可视化**：后端在ParseTree基础上归约生成AST，输出`.dot`字符串，前端同样用viz.js渲染，突出程序的语义结构和核心逻辑。
+            *   **交互体验**：两种树均支持缩放、拖拽、节点高亮等交互，便于用户对比和理解不同层次的代码结构。
         *   4.3 **错误信息展示**: 设计错误信息的展示界面，实现代码行的错误高亮，创建错误列表面板
     *   **技术实现**:
         *   **TokenStream**: 修改后端逻辑，使其返回一个包含所有Token的列表（JSON格式），并在前端以表格形式展示
-        *   **ParseTree/AST (使用Graphviz)**:
-            *   后端：编写一个访问者（Visitor）或监听器（Listener）来遍历ANTLR生成的解析树，并生成符合Graphviz要求的 `.dot` 文件格式的字符串
-            *   前端：接收到 `.dot` 字符串后，使用 `viz.js` (Graphviz的JavaScript移植版) 在浏览器中直接渲染出图形
+        *   **ParseTree（CST）和AST (使用Graphviz)**:
+            *   后端：分别为ParseTree（CST）和AST实现遍历与归约逻辑，生成各自的Graphviz `.dot` 文件格式字符串。
+            *   前端：接收到两种`.dot`字符串后，利用viz.js渲染为可交互的具体语法树和抽象语法树，支持切换、对比和结构分析。
 
 
 ## 第二阶段：语义分析与LLVM IR生成 (选做加分项)

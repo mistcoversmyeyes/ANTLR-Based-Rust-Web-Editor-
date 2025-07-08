@@ -31,8 +31,11 @@
     // ... 更多 tokens
   ],
   "parseTree": {
-    "lisp": "语法树的LISP表示",
-    "dot": "语法树的DOT格式（用于Graphviz可视化）"
+    "lisp": "ParseTree（CST）的LISP表示",
+    "dot": "ParseTree（CST）的DOT格式（用于Graphviz可视化）"
+  },
+  "ast": {
+    "dot": "AST（抽象语法树）的DOT格式（待实现）"
   },
   "errors": []
 }

@@ -41,10 +41,14 @@ fn main() {
         }
     ],
 
-    // 解析树信息
+    // ParseTree（具体语法树/CST）信息
     "parseTree": {
-        "lisp": string,       // LISP格式的语法树表示
-        "dot": string         // DOT格式的语法树（用于Graphviz可视化）
+        "dot": string ,        // DOT格式的ParseTree（用于Graphviz可视化）
+    },
+    
+    // AST（抽象语法树）信息
+    "ast": {
+        "dot": string         // DOT格式的AST（用于Graphviz可视化）
     },
 
     // 错误信息数组（如果有）
@@ -83,6 +87,9 @@ fn main() {
         "lisp": "(crate (function_item fn main ( ) { (expression_statement (call_expression println! ( \"Hello, World!\" ) ) ) }))",
         "dot": "digraph G {\n  node0 [label=\"crate\"];\n  node1 [label=\"function_item\"];\n  node0 -> node1;\n  node2 [label=\"fn\"];\n  node1 -> node2;\n  ...\n}"
     },
+    "ast": {
+        "dot": "digraph G {\n  node0 [label=\"Program\"];\n  node1 [label=\"FnDecl\"];\n  node0 -> node1;\n  node2 [label=\"main\"];\n  node1 -> node2;\n  ...\n}"
+    },
     "errors": []
 }
 ```
@@ -104,6 +111,9 @@ fn main() {
         "lisp": "",
         "dot": ""
     },
+    "ast": {
+        "dot": ""
+    },
     "errors": [
         {
             "line": 1,
@@ -122,11 +132,14 @@ fn main() {
    - `line`: 行号从 1 开始计数
    - `column`: 列号从 0 开始计数
 
-2. **解析树**:
-   - `lisp`: 使用 LISP S-表达式格式表示的语法树，主要用于调试
-   - `dot`: 符合 Graphviz DOT 语言格式的语法树表示，可以用 viz.js 等工具在前端渲染为可视化图形
+2. **ParseTree（具体语法树/CST）**:
+   - `parseTree.lisp`: 使用 LISP S-表达式格式表示的ParseTree，完整反映源代码的语法结构
+   - `parseTree.dot`: 符合 Graphviz DOT 语言格式的ParseTree表示，可以用 viz.js 等工具在前端渲染为可视化图形
 
-3. **错误处理**:
+3. **AST（抽象语法树）**:
+   - `ast.dot`: 符合 Graphviz DOT 语言格式的AST表示，经过语义归约，突出程序的语义结构和核心逻辑
+
+4. **错误处理**:
    - 当 `success` 为 `false` 时，`errors` 数组至少包含一个错误
-   - 语法分析可能在发生错误时继续执行，因此即使有错误，`tokens` 和 `parseTree` 也可能包含部分结果
+   - 语法分析可能在发生错误时继续执行，因此即使有错误，`tokens`、`parseTree` 和 `ast` 也可能包含部分结果
    - 每个错误都包含准确的位置信息，便于在编辑器中高亮显示

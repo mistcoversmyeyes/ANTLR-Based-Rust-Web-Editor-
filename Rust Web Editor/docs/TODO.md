@@ -4,19 +4,19 @@
 - [ ] `antlr4` 命令和 `grun` 命令的使用方法中文文档
 - [ ] `.g4` 文件撰写格式中文文档
 - [ ] `antlr4` 根据语法文件生成的 Scanner 和 Parser 的代码的结构拆解文档
-- [ ] 根据结构拆解文档，探索如何利用生成的 Scanner 和 Parser 进行
+- [ ] 根据结构拆解文档，探索如何利用生成的 Scanner 和 Parser 进行词法语法分析，生成TokenStream、ParseTree（CST）和AST
 - [x] 编辑器前端搭建框架选择 与 框架介绍
 - [x] 前端开发环境搭建文档
 - [x] 前端 API 调用与数据格式说明文档
-- [ ] 前端结果可视化实现说明文档
+- [ ] 前端TokenStream、ParseTree（CST）和AST结果可视化实现说明文档
 
 # 程序功能实现
 
 ## 第一阶段：完善核心前端功能 (Web编辑器)
 - [x] 搭建Web服务器
   - [x] 创建基础的 `WebServer.java` 并引入 Javalin
-  - [x] 定义分析结果的 JSON 数据结构 (Token, .dot格式的ParseTree, Errors)
-  - [x] 将antlr解析逻辑封装为 `AnalysisService` 类，这个类应当为webserver提供对于输入的Rust源代码的词法和语法分析，包含报错信息和成功分析的部分。
+  - [x] 定义分析结果的 JSON 数据结构 (Token, ParseTree的.dot格式, AST的.dot格式, Errors)
+  - [x] 将antlr解析逻辑封装为 `AnalysisService` 类，这个类应当为webserver提供对于输入的Rust源代码的词法和语法分析，包含报错信息和成功分析的部分（目前支持TokenStream和ParseTree/CST，待扩展AST生成）。
     - [x] 添加JSON调试输出功能，便于开发调试
   - [x] 在 `WebServer` 中调用 `AnalysisService`，处理来自前端的代码
 
@@ -35,7 +35,8 @@
   - [x] 设计整体页面布局（编辑器 + 结果展示区域）
   - [x] 添加"分析"按钮和加载状态
   - [x] 创建 TokenStream 结果展示区域
-  - [x] 创建 ParseTree/AST 可视化区域
+  - [x] 创建 ParseTree（CST）可视化区域
+  - [ ] 创建 AST（抽象语法树）可视化区域
   - [x] 创建错误信息展示区域
   - [x] 实现响应式布局
 - [x] 3.4 实现与后端的通信
@@ -49,14 +50,16 @@
   - [x] 设计 Token 列表的展示格式（表格形式）
   - [x] 实现 JSON 数据到前端展示的转换
   - [x] 添加 Token 信息的详细展示（类型、值、位置等）
-- [x] 4.2 ParseTree/AST 可视化
+- [x] 4.2 ParseTree（CST）和 AST 可视化
   - [x] 集成 viz.js 库
   - [x] 修复 AMD 模块冲突问题（Monaco Editor 与 Viz.js 兼容性）
   - [x] 实现 Viz.js 正确加载和初始化
   - [x] **[已修复]** 后端 DOT 字符串生成问题：字符串字面量转义错误
-  - [x] **[已修复]** 后端 DOT 生成核心问题：节点ID重复分配导致解析树结构错误
-  - [x] 实现 .dot 字符串到图形的渲染
-  - [ ] 添加图形的缩放、拖拽等交互功能
+  - [x] **[已修复]** 后端 DOT 生成核心问题：节点ID重复分配导致ParseTree结构错误
+  - [x] 实现 ParseTree（CST）.dot 字符串到图形的渲染
+  - [ ] 实现 AST（抽象语法树）生成与可视化
+  - [ ] 添加CST和AST图形的缩放、拖拽等交互功能
+  - [ ] 实现CST和AST的切换显示功能
   - [ ] 优化大型语法树的显示性能
 - [x] 4.3 错误信息展示
   - [x] 设计错误信息的展示界面
