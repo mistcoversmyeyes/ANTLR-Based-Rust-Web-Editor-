@@ -29,10 +29,10 @@ public class ASTGenerator {
      * AST 节点表示
      */
     public static class ASTNode {
-        private String label;
-        private String type;
-        private List<ASTNode> children;
-        private boolean isTerminal;
+        private String label;   // 节点名称
+        private String type;    // V_T 或者 V_N
+        private List<ASTNode> children;     // 兄弟列表
+        private boolean isTerminal;         // 当前节点是否是 V_T
         
         public ASTNode(String label, String type, boolean isTerminal) {
             this.label = label;
