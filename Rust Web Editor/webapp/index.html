@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rust Web Editor - ANTLR 编译器前端</title>
+    
+    <!-- CSS 样式 -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/editor.css">
+    <link rel="stylesheet" href="css/components.css">
+    
+    <!-- Monaco Editor -->
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
+    
+    <!-- Viz.js for Graphviz visualization - 避免AMD冲突 -->
+    <script>
+        // 暂时禁用AMD以避免与Monaco冲突
+        window.oldDefine = window.define;
+        window.define = undefined;
+    </script>
+    <script src="https://unpkg.com/viz.js@2.1.2/viz.js"></script>
+    <script src="https://unpkg.com/viz.js@2.1.2/full.render.js"></script>
+    <script>
+        // 恢复AMD
+        window.define = window.oldDefine;
+        delete window.oldDefine;
+    </script>
+    
+    <!-- 确保 Viz.js 正确加载 -->
+    <script>
+        // 检查 Viz.js 是否加载成功
+        window.addEventListener('load', function() {
+            console.log('页面加载完成，检查 Viz.js 状态：', typeof Viz !== 'undefined' ? 'OK' : '未加载');
+            if (typeof Viz !== 'undefined') {
+                console.log('Viz 对象：', Viz);
+                window.VizLoaded = true;
+            } else {
+                console.error('Viz.js 加载失败，将尝试动态加载');
+                window.VizLoaded = false;
+            }
+        });
+    </script>
+    
+    <!-- 备用方案：直接内联加载 -->
+    <script>
+        // 确保 Viz.js 正确加载的备用方案
+        window.ensureVizLoaded = function() {
+            return new Promise((resolve, reject) => {
+                if (typeof Viz !== 'undefined') {
+                    console.log('Viz.js 已经加载');
+                    resolve();
+                    return;
+                }
+                
+                console.log('动态加载 Viz.js...');
+                
+                // 暂时禁用AMD以避免冲突
+                const oldDefine = window.define;
+                window.define = undefined;
+                
+                const script1 = document.createElement('script');
+                script1.src = 'https://unpkg.com/viz.js@2.1.2/viz.js';
+                script1.onload = function() {
+                    console.log('Viz.js 主文件加载完成');
+                    const script2 = document.createElement('script');
+                    script2.src = 'https://unpkg.com/viz.js@2.1.2/full.render.js';
+                    script2.onload = function() {
+                        console.log('Viz.js 渲染器加载完成');
+                        
+                        // 恢复AMD
+                        window.define = oldDefine;
+                        
+                        // 等待一下确保全局变量可用
+                        setTimeout(() => {
+                            if (typeof Viz !== 'undefined') {
+                                console.log('Viz.js 动态加载成功');
+                                resolve();
+                            } else {
+                                reject(new Error('Viz.js 加载后仍不可用'));
+                            }
+                        }, 100);
+                    };
+                    script2.onerror = (error) => {
+                        window.define = oldDefine;
+                        reject(error);
+                    };
+                    document.head.appendChild(script2);
+                };
+                script1.onerror = (error) => {
+                    window.define = oldDefine;
+                    reject(error);
+                };
+                document.head.appendChild(script1);
+            });
+        };
+    </script>
+</head>
+<body>
+    <!-- 头部区域 -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="title">
+                <span class="rust-icon">🦀</span>
+                Rust Web Editor
+            </h1>
+            <div class="header-actions">
+                <button id="analyzeBtn" class="btn btn-primary">
+                    <span class="btn-icon">🔍</span>
+                    分析代码
+                </button>
+                <button id="clearBtn" class="btn btn-secondary">
+                    <span class="btn-icon">🗑️</span>
+                    清空
+                </button>
+                <button id="exampleBtn" class="btn btn-secondary">
+                    <span class="btn-icon">📝</span>
+                    加载示例
+                </button>
+            </div>
+        </div>
+        <div class="loading-bar" id="loadingBar"></div>
+    </header>
+
+    <!-- 主要内容区域 -->
+    <main class="main-content">
+        <!-- 左侧编辑器 -->
+        <div class="editor-panel">
+            <div class="panel-header">
+                <h2>Rust 代码编辑器</h2>
+                <div class="editor-controls">
+                    <select id="themeSelect" class="theme-select">
+                        <option value="vs-dark">暗色主题</option>
+                        <option value="vs">亮色主题</option>
+                        <option value="hc-black">高对比度</option>
+                    </select>
+                </div>
+            </div>
+            <div id="monaco-editor" class="monaco-container"></div>
+        </div>
+
+        <!-- 右侧结果面板 -->
+        <div class="results-panel">
+            <!-- 选项卡导航 -->
+            <div class="tabs">
+                <button class="tab-button active" data-tab="tokens">Token 流</button>
+                <button class="tab-button" data-tab="parsetree">解析树</button>
+                <button class="tab-button" data-tab="ast">AST</button>
+                <button class="tab-button" data-tab="errors">错误信息</button>
+            </div>
+
+            <!-- Token 流显示 -->
+            <div id="tokens-tab" class="tab-content active">
+                <div class="tab-header">
+                    <h3>Token 流</h3>
+                    <div class="tab-actions">
+                        <button class="btn btn-small" id="exportTokens">导出</button>
+                    </div>
+                </div>
+                <div class="token-container">
+                    <table id="tokensTable" class="tokens-table">
+                        <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>类型</th>
+                                <th>文本</th>
+                                <th>行号</th>
+                                <th>列号</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tokensTableBody">
+                            <tr class="empty-state">
+                                <td colspan="5">暂无数据，请先分析代码</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 解析树显示 -->
+            <div id="parsetree-tab" class="tab-content">
+                <div class="tab-header">
+                    <h3>解析树 (Parse Tree)</h3>
+                    <div class="tab-actions">
+                        <button class="btn btn-small" id="exportParseTree">导出SVG</button>
+                        <button class="btn btn-small" id="fitParseTree">适应窗口</button>
+                        <button class="btn btn-small" id="resetZoom">重置缩放</button>
+                    </div>
+                </div>
+                <div class="visualization-container">
+                    <div id="parseTreeViz" class="graph-container">
+                        <div class="empty-state">
+                            <p>暂无解析树，请先分析代码</p>
+                        </div>
+                        <div class="keyboard-shortcuts">
+                            滚轮: 缩放 | 拖拽: 平移 | 双击: 适应窗口<br>
+                            +/-: 缩放 | Ctrl+0: 重置 | Ctrl+F: 适应窗口
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AST 显示 -->
+            <div id="ast-tab" class="tab-content">
+                <div class="tab-header">
+                    <h3>抽象语法树 (AST)</h3>
+                    <div class="tab-actions">
+                        <button class="btn btn-small" id="exportAST">导出SVG</button>
+                        <button class="btn btn-small" id="fitAST">适应窗口</button>
+                        <button class="btn btn-small" id="resetASTZoom">重置缩放</button>
+                    </div>
+                </div>
+                <div class="visualization-container">
+                    <div id="astViz" class="graph-container">
+                        <div class="empty-state">
+                            <p>暂无AST，请先分析代码</p>
+                        </div>
+                        <div class="keyboard-shortcuts">
+                            滚轮: 缩放 | 拖拽: 平移 | 双击: 适应窗口<br>
+                            +/-: 缩放 | Ctrl+0: 重置 | Ctrl+F: 适应窗口
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 错误信息显示 -->
+            <div id="errors-tab" class="tab-content">
+                <div class="tab-header">
+                    <h3>错误信息</h3>
+                    <div class="error-summary" id="errorSummary">
+                        <span class="error-count">0 个错误</span>
+                    </div>
+                </div>
+                <div class="error-container">
+                    <div id="errorsList" class="errors-list">
+                        <div class="empty-state success">
+                            <p>✅ 暂无错误</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 底部状态栏 -->
+    <footer class="status-bar">
+        <div class="status-left">
+            <span id="statusText">就绪</span>
+        </div>
+        <div class="status-right">
+            <span id="lineCol">行 1, 列 1</span>
+            <span id="serverStatus" class="server-status offline">服务器未连接</span>
+        </div>
+    </footer>
+
+    <!-- 模态框 -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">标题</h3>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                内容
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="modalCancel">取消</button>
+                <button class="btn btn-primary" id="modalConfirm">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript 模块 -->
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/editor.js"></script>
+    <script src="js/visualizer.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

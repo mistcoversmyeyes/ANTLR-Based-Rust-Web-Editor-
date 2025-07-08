@@ -7,12 +7,14 @@ public class AnalysisResult {
     public boolean success;
     public List<TokenInfo> tokens;
     public ParseTreeInfo parseTree;
+    public ASTInfo ast;
     public List<ErrorInfo> errors;
 
     public AnalysisResult() {
         this.tokens = new ArrayList<>();
         this.errors = new ArrayList<>();
         this.parseTree = new ParseTreeInfo();
+        this.ast = new ASTInfo();
     }
 
     // Getters and Setters
@@ -24,6 +26,9 @@ public class AnalysisResult {
     
     public ParseTreeInfo getParseTree() { return parseTree; }
     public void setParseTree(ParseTreeInfo parseTree) { this.parseTree = parseTree; }
+    
+    public ASTInfo getAst() { return ast; }
+    public void setAst(ASTInfo ast) { this.ast = ast; }
     
     public List<ErrorInfo> getErrors() { return errors; }
     public void setErrors(List<ErrorInfo> errors) { this.errors = errors; }
