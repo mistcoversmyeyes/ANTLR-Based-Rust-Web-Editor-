@@ -169,6 +169,8 @@ class ApiClient {
             return false;
         }
 
+        // TODO: 验证 AST 格式
+
         // 验证errors格式
         for (const error of response.errors) {
             if (typeof error.line !== 'number' || 
