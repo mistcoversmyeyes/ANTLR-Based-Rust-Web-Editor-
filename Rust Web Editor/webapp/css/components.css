@@ -86,6 +86,12 @@
     overflow: auto;
     position: relative;
     background-color: var(--bg-primary);
+    cursor: grab;
+    user-select: none;
+}
+
+.graph-container:active {
+    cursor: grabbing;
 }
 
 .graph-container svg {
@@ -93,6 +99,9 @@
     height: auto;
     display: block;
     margin: 0 auto;
+    transition: transform 0.2s ease-out;
+    max-width: none !important;
+    max-height: none !important;
 }
 
 /* 图形控制按钮 */
@@ -120,10 +129,18 @@
     font-size: var(--font-size-sm);
     transition: var(--transition);
     box-shadow: var(--shadow);
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: var(--font-family-mono);
 }
 
 .graph-control-btn:hover {
-    background-color: var(--primary-color);
+    background: rgba(0, 0, 0, 0.9);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
     color: white;
 }
 
@@ -602,4 +619,132 @@
     .notification-message {
         font-size: 0.8rem;
     }
+}
+
+/* 图形可视化增强样式 */
+.graph-container {
+    position: relative;
+    overflow: hidden;
+    cursor: grab;
+    user-select: none;
+}
+
+.graph-container:active {
+    cursor: grabbing;
+}
+
+.graph-container svg {
+    transition: transform 0.2s ease-out;
+    max-width: none !important;
+    max-height: none !important;
+}
+
+/* 缩放指示器 */
+.zoom-indicator {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    background: rgba(0, 0, 0, 0.85) !important;
+    color: white !important;
+    padding: 6px 12px !important;
+    border-radius: 6px !important;
+    font-size: 12px !important;
+    font-family: var(--font-family-mono) !important;
+    font-weight: 600 !important;
+    z-index: 1000 !important;
+    pointer-events: none !important;
+    transition: opacity 0.3s ease !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* 图形控制按钮增强 */
+.graph-controls {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    gap: 8px;
+    z-index: 100;
+}
+
+.graph-control-btn {
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: var(--font-family-mono);
+}
+
+.graph-control-btn:hover {
+    background: rgba(0, 0, 0, 0.9);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+}
+
+/* 键盘快捷键提示 */
+.keyboard-shortcuts {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-family: var(--font-family-mono);
+    line-height: 1.4;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 100;
+}
+
+.graph-container:hover .keyboard-shortcuts {
+    opacity: 1;
+}
+
+/* 空状态样式增强 */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    text-align: center;
+}
+
+.empty-state.success {
+    color: var(--success-color);
+}
+
+.empty-state p {
+    margin: 0;
+    opacity: 0.7;
+}
+
+/* 图形容器的滚动条美化 */
+.graph-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.graph-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.graph-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.graph-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
