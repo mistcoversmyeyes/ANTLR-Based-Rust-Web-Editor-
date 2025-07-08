@@ -107,21 +107,23 @@ public class AnalysisResultFactory {
             ASTGenerator.ASTNode astRoot = ASTGenerator.generateAST(parseTree, parser);
             
             if (astRoot != null) {
-                // 创建 AST 信息对象（需要扩展 ParseTreeInfo 或创建新的 ASTInfo 类）
-                // 这里先复用 ParseTreeInfo，后续可以创建专门的 ASTInfo 类
+                // 获取 AST 信息对象
+                ASTInfo astInfo = result.ast;
                 
                 // 生成 AST 的 DOT 表示
                 String astDot = ASTGenerator.generateASTDotString(astRoot);
+                astInfo.setDot(astDot);
                 
-                // 暂时存储在 parseTree 对象中，后续可以扩展数据模型
-                // 这里展示了扩展的方向
-                
-                // TODO: 在类 AnalysisResult 中创建专门的 ASTInfo 类和相应的字段，然后在API文档中调整后端返回请求的格式，添加AST字段
                 System.out.println("AST generated successfully, DOT length: " + astDot.length());
+            } else {
+                // AST 生成失败，设置空的 DOT 字符串
+                result.ast.setDot("");
+                System.out.println("AST generation returned null");
             }
         } catch (Exception e) {
             System.err.println("Failed to generate AST: " + e.getMessage());
-            // AST 生成失败不影响其他分析结果
+            // AST 生成失败，设置空的 DOT 字符串
+            result.ast.setDot("");
         }
     }
 }
