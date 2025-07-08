@@ -132,7 +132,7 @@ class ResultVisualizer {
                 this.tokenRenderer.renderTokens(data.tokens);
             }
             
-            // 显示解析树
+            // 显示解析树（ParseTree/CST）
             if (data.parseTree && data.parseTree.dot) {
                 console.log('开始渲染解析树，DOT 长度:', data.parseTree.dot.length);
                 this.graphRenderer.renderGraph(data.parseTree.dot, 'parseTreeViz');
@@ -143,6 +143,24 @@ class ResultVisualizer {
                     parseTreeContainer.innerHTML = `
                         <div class="empty-state">
                             <p>⚠️ 没有解析树数据</p>
+                        </div>
+                    `;
+                }
+            }
+            
+            // 显示AST（抽象语法树）
+            if (data.ast && data.ast.dot) {
+                console.log('开始渲染AST，DOT 长度:', data.ast.dot.length);
+                console.log('AST DOT 数据预览:', data.ast.dot.substring(0, 200));
+                this.graphRenderer.renderGraph(data.ast.dot, 'astViz');
+            } else {
+                console.warn('没有AST数据或 DOT 数据为空, AST对象:', data.ast);
+                const astContainer = Utils.DOM.id('astViz');
+                if (astContainer) {
+                    astContainer.innerHTML = `
+                        <div class="empty-state">
+                            <p>⚠️ 没有AST数据</p>
+                            <p style="font-size: 0.8em; color: #666;">请检查后端AST生成是否正常</p>
                         </div>
                     `;
                 }
