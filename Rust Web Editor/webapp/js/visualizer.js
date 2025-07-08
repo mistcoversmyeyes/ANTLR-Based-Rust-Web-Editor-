@@ -116,6 +116,33 @@ class ResultVisualizer {
                 this.graphRenderer.resetZoom('astViz');
             });
         }
+
+        // 适应窗口按钮
+        const fitParseTreeBtn = Utils.DOM.id('fitParseTree');
+        if (fitParseTreeBtn) {
+            Utils.DOM.on(fitParseTreeBtn, 'click', () => {
+                const container = Utils.DOM.id('parseTreeViz');
+                const svgElement = container ? container.querySelector('svg') : null;
+                if (svgElement) {
+                    this.graphRenderer.fitToContainer(svgElement, 'parseTreeViz');
+                } else {
+                    Utils.Notification.warning('没有可调整的解析树图形');
+                }
+            });
+        }
+
+        const fitASTBtn = Utils.DOM.id('fitAST');
+        if (fitASTBtn) {
+            Utils.DOM.on(fitASTBtn, 'click', () => {
+                const container = Utils.DOM.id('astViz');
+                const svgElement = container ? container.querySelector('svg') : null;
+                if (svgElement) {
+                    this.graphRenderer.fitToContainer(svgElement, 'astViz');
+                } else {
+                    Utils.Notification.warning('没有可调整的AST图形');
+                }
+            });
+        }
     }
 
     /**
@@ -132,7 +159,7 @@ class ResultVisualizer {
                 this.tokenRenderer.renderTokens(data.tokens);
             }
             
-            // 显示解析树
+            // 显示解析树（ParseTree/CST）
             if (data.parseTree && data.parseTree.dot) {
                 console.log('开始渲染解析树，DOT 长度:', data.parseTree.dot.length);
                 this.graphRenderer.renderGraph(data.parseTree.dot, 'parseTreeViz');
@@ -143,6 +170,24 @@ class ResultVisualizer {
                     parseTreeContainer.innerHTML = `
                         <div class="empty-state">
                             <p>⚠️ 没有解析树数据</p>
+                        </div>
+                    `;
+                }
+            }
+            
+            // 显示AST（抽象语法树）
+            if (data.ast && data.ast.dot) {
+                console.log('开始渲染AST，DOT 长度:', data.ast.dot.length);
+                console.log('AST DOT 数据预览:', data.ast.dot.substring(0, 200));
+                this.graphRenderer.renderGraph(data.ast.dot, 'astViz');
+            } else {
+                console.warn('没有AST数据或 DOT 数据为空, AST对象:', data.ast);
+                const astContainer = Utils.DOM.id('astViz');
+                if (astContainer) {
+                    astContainer.innerHTML = `
+                        <div class="empty-state">
+                            <p>⚠️ 没有AST数据</p>
+                            <p style="font-size: 0.8em; color: #666;">请检查后端AST生成是否正常</p>
                         </div>
                     `;
                 }
@@ -321,6 +366,7 @@ class GraphRenderer {
         this.graphviz = null;
         this.currentGraphs = new Map();
         this.zoomFactors = new Map();
+        this.transformStates = new Map(); // 存储每个容器的变换状态
     }
 
     /**
@@ -543,32 +589,60 @@ class GraphRenderer {
     setupGraphInteraction(svgElement, containerId) {
         let isDragging = false;
         let startX, startY, startTransform;
+        let translateX = 0, translateY = 0;
         
         // 获取当前缩放因子
         let zoomFactor = this.zoomFactors.get(containerId) || 1;
         
-        // 鼠标滚轮缩放
+        // 更新变换矩阵
+        const updateTransform = () => {
+            svgElement.style.transform = `translate(${translateX}px, ${translateY}px) scale(${zoomFactor})`;
+            svgElement.style.transformOrigin = 'center center';
+        };
+        
+        // 鼠标滚轮缩放 - 支持更大的缩放范围
         Utils.DOM.on(svgElement, 'wheel', (e) => {
             e.preventDefault();
             
-            const delta = e.deltaY > 0 ? 0.9 : 1.1;
-            zoomFactor *= delta;
-            zoomFactor = Math.max(0.1, Math.min(5, zoomFactor)); // 限制缩放范围
+            // 获取鼠标位置作为缩放中心
+            const rect = svgElement.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
             
-            svgElement.style.transform = `scale(${zoomFactor})`;
+            // 计算相对于中心的偏移
+            const offsetX = (mouseX - centerX) / zoomFactor;
+            const offsetY = (mouseY - centerY) / zoomFactor;
+            
+            // 更精细的缩放控制
+            const delta = e.deltaY > 0 ? 0.85 : 1.18;
+            const oldZoom = zoomFactor;
+            zoomFactor *= delta;
+            
+            // 大幅扩展缩放范围：从0.01到50倍
+            zoomFactor = Math.max(0.01, Math.min(50, zoomFactor));
+            
+            // 根据鼠标位置调整平移，实现以鼠标为中心的缩放
+            const zoomChange = zoomFactor / oldZoom;
+            translateX -= offsetX * (zoomChange - 1) * oldZoom;
+            translateY -= offsetY * (zoomChange - 1) * oldZoom;
+            
+            updateTransform();
             this.zoomFactors.set(containerId, zoomFactor);
+            
+            // 显示当前缩放比例
+            this.showZoomIndicator(containerId, zoomFactor);
         });
 
-        // 鼠标拖拽
+        // 改进的鼠标拖拽 - 支持在任意缩放下的平移
         Utils.DOM.on(svgElement, 'mousedown', (e) => {
             isDragging = true;
             startX = e.clientX;
             startY = e.clientY;
             
-            const transform = svgElement.style.transform;
-            startTransform = transform || '';
-            
             svgElement.style.cursor = 'grabbing';
+            e.preventDefault(); // 防止选择文本
         });
 
         Utils.DOM.on(document, 'mousemove', (e) => {
@@ -577,7 +651,13 @@ class GraphRenderer {
             const deltaX = e.clientX - startX;
             const deltaY = e.clientY - startY;
             
-            svgElement.style.transform = `${startTransform} translate(${deltaX}px, ${deltaY}px)`;
+            translateX += deltaX;
+            translateY += deltaY;
+            
+            updateTransform();
+            
+            startX = e.clientX;
+            startY = e.clientY;
         });
 
         Utils.DOM.on(document, 'mouseup', () => {
@@ -587,8 +667,57 @@ class GraphRenderer {
             }
         });
 
-        // 设置初始光标
+        // 双击重置到适合窗口大小
+        Utils.DOM.on(svgElement, 'dblclick', (e) => {
+            e.preventDefault();
+            this.fitToContainer(svgElement, containerId);
+        });
+
+        // 键盘快捷键支持
+        Utils.DOM.on(document, 'keydown', (e) => {
+            // 只在对应容器聚焦时响应
+            if (!svgElement.matches(':hover')) return;
+            
+            switch (e.key) {
+                case '+':
+                case '=':
+                    e.preventDefault();
+                    zoomFactor *= 1.2;
+                    zoomFactor = Math.min(50, zoomFactor);
+                    updateTransform();
+                    this.zoomFactors.set(containerId, zoomFactor);
+                    this.showZoomIndicator(containerId, zoomFactor);
+                    break;
+                case '-':
+                    e.preventDefault();
+                    zoomFactor /= 1.2;
+                    zoomFactor = Math.max(0.01, zoomFactor);
+                    updateTransform();
+                    this.zoomFactors.set(containerId, zoomFactor);
+                    this.showZoomIndicator(containerId, zoomFactor);
+                    break;
+                case '0':
+                    if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        this.resetZoom(containerId);
+                    }
+                    break;
+                case 'f':
+                    if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        this.fitToContainer(svgElement, containerId);
+                    }
+                    break;
+            }
+        });
+
+        // 设置初始光标和样式
         svgElement.style.cursor = 'grab';
+        svgElement.style.userSelect = 'none';
+        
+        // 保存变换状态
+        this.transformStates = this.transformStates || new Map();
+        this.transformStates.set(containerId, { translateX, translateY, zoomFactor });
     }
 
     /**
@@ -600,9 +729,99 @@ class GraphRenderer {
 
         const svgElement = container.querySelector('svg');
         if (svgElement) {
-            svgElement.style.transform = '';
+            svgElement.style.transform = 'translate(0px, 0px) scale(1)';
+            svgElement.style.transformOrigin = 'center center';
             this.zoomFactors.set(containerId, 1);
+            
+            // 重置变换状态
+            if (this.transformStates) {
+                this.transformStates.set(containerId, { translateX: 0, translateY: 0, zoomFactor: 1 });
+            }
+            
+            this.showZoomIndicator(containerId, 1);
         }
+    }
+
+    /**
+     * 适应容器大小
+     */
+    fitToContainer(svgElement, containerId) {
+        if (!svgElement) return;
+        
+        const container = svgElement.parentElement;
+        if (!container) return;
+        
+        // 获取SVG的实际尺寸
+        const svgRect = svgElement.getBBox ? svgElement.getBBox() : svgElement.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        
+        // 计算缩放比例，留出一些边距
+        const scaleX = (containerRect.width * 0.9) / svgRect.width;
+        const scaleY = (containerRect.height * 0.9) / svgRect.height;
+        const scale = Math.min(scaleX, scaleY, 1); // 最大不超过1倍
+        
+        // 应用变换
+        svgElement.style.transform = `translate(0px, 0px) scale(${scale})`;
+        svgElement.style.transformOrigin = 'center center';
+        
+        this.zoomFactors.set(containerId, scale);
+        if (this.transformStates) {
+            this.transformStates.set(containerId, { translateX: 0, translateY: 0, zoomFactor: scale });
+        }
+        
+        this.showZoomIndicator(containerId, scale);
+    }
+
+    /**
+     * 显示缩放指示器
+     */
+    showZoomIndicator(containerId, zoomFactor) {
+        // 移除之前的指示器
+        const existingIndicator = document.querySelector(`#${containerId} .zoom-indicator`);
+        if (existingIndicator) {
+            existingIndicator.remove();
+        }
+        
+        // 创建新的指示器
+        const container = Utils.DOM.id(containerId);
+        if (!container) return;
+        
+        const indicator = Utils.DOM.create('div', { 
+            className: 'zoom-indicator',
+            style: `
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 5px 10px;
+                border-radius: 4px;
+                font-size: 12px;
+                font-family: monospace;
+                z-index: 1000;
+                pointer-events: none;
+                transition: opacity 0.3s ease;
+            `
+        });
+        
+        const percentage = Math.round(zoomFactor * 100);
+        indicator.textContent = `${percentage}%`;
+        
+        // 添加到容器
+        container.style.position = 'relative';
+        container.appendChild(indicator);
+        
+        // 3秒后自动隐藏
+        setTimeout(() => {
+            if (indicator.parentElement) {
+                indicator.style.opacity = '0';
+                setTimeout(() => {
+                    if (indicator.parentElement) {
+                        indicator.remove();
+                    }
+                }, 300);
+            }
+        }, 2000);
     }
 
     /**
@@ -646,6 +865,7 @@ class GraphRenderer {
     clear() {
         this.currentGraphs.clear();
         this.zoomFactors.clear();
+        this.transformStates.clear();
         
         // 清空解析树容器
         const parseTreeContainer = Utils.DOM.id('parseTreeViz');
@@ -1013,18 +1233,61 @@ window.debugViz = {
             return null;
         }
     },
-    
-    // 测试修复后的 DOT
-    testFixedDot: () => {
-        const dot = debugViz.analyzeDot();
-        if (dot) {
-            console.log('=== 测试修复后的 DOT ===');
-            const renderer = resultVisualizer.graphRenderer;
-            const fixedDot = renderer.fixDotSyntax(dot);
-            console.log('修复后长度:', fixedDot.length);
-            console.log('修复后前200字符:', fixedDot.substring(0, 200));
-            return fixedDot;
+    // 测试缩放功能
+    testZoom: (containerId = 'astViz', factor = 10) => {
+        const renderer = resultVisualizer.graphRenderer;
+        const container = Utils.DOM.id(containerId);
+        if (container) {
+            const svgElement = container.querySelector('svg');
+            if (svgElement) {
+                svgElement.style.transform = `translate(0px, 0px) scale(${factor})`;
+                svgElement.style.transformOrigin = 'center center';
+                renderer.zoomFactors.set(containerId, factor);
+                renderer.showZoomIndicator(containerId, factor);
+                console.log(`设置 ${containerId} 缩放为 ${factor}x`);
+            } else {
+                console.log(`${containerId} 中没有找到 SVG 元素`);
+            }
+        } else {
+            console.log(`容器 ${containerId} 未找到`);
         }
-        return null;
+    },
+    
+    // 测试适应容器大小
+    testFit: (containerId = 'astViz') => {
+        const renderer = resultVisualizer.graphRenderer;
+        const container = Utils.DOM.id(containerId);
+        if (container) {
+            const svgElement = container.querySelector('svg');
+            if (svgElement) {
+                renderer.fitToContainer(svgElement, containerId);
+                console.log(`${containerId} 已适应容器大小`);
+            } else {
+                console.log(`${containerId} 中没有找到 SVG 元素`);
+            }
+        } else {
+            console.log(`容器 ${containerId} 未找到`);
+        }
+    },
+    
+    // 显示当前缩放状态
+    showZoomStatus: () => {
+        const renderer = resultVisualizer.graphRenderer;
+        console.log('=== 当前缩放状态 ===');
+        console.log('缩放因子:', Object.fromEntries(renderer.zoomFactors));
+        if (renderer.transformStates) {
+            console.log('变换状态:', Object.fromEntries(renderer.transformStates));
+        }
+        
+        // 检查实际的SVG变换
+        ['parseTreeViz', 'astViz'].forEach(id => {
+            const container = Utils.DOM.id(id);
+            if (container) {
+                const svg = container.querySelector('svg');
+                if (svg) {
+                    console.log(`${id} SVG变换:`, svg.style.transform);
+                }
+            }
+        });
     }
 };

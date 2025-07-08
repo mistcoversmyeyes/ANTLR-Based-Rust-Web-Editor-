@@ -183,6 +183,7 @@
                     <h3>解析树 (Parse Tree)</h3>
                     <div class="tab-actions">
                         <button class="btn btn-small" id="exportParseTree">导出SVG</button>
+                        <button class="btn btn-small" id="fitParseTree">适应窗口</button>
                         <button class="btn btn-small" id="resetZoom">重置缩放</button>
                     </div>
                 </div>
@@ -190,6 +191,10 @@
                     <div id="parseTreeViz" class="graph-container">
                         <div class="empty-state">
                             <p>暂无解析树，请先分析代码</p>
+                        </div>
+                        <div class="keyboard-shortcuts">
+                            滚轮: 缩放 | 拖拽: 平移 | 双击: 适应窗口<br>
+                            +/-: 缩放 | Ctrl+0: 重置 | Ctrl+F: 适应窗口
                         </div>
                     </div>
                 </div>
@@ -201,6 +206,7 @@
                     <h3>抽象语法树 (AST)</h3>
                     <div class="tab-actions">
                         <button class="btn btn-small" id="exportAST">导出SVG</button>
+                        <button class="btn btn-small" id="fitAST">适应窗口</button>
                         <button class="btn btn-small" id="resetASTZoom">重置缩放</button>
                     </div>
                 </div>
@@ -209,6 +215,11 @@
                         <div class="empty-state">
                             <p>暂无AST，请先分析代码</p>
                         </div>
+                        <div class="keyboard-shortcuts">
+                            滚轮: 缩放 | 拖拽: 平移 | 双击: 适应窗口<br>
+                            +/-: 缩放 | Ctrl+0: 重置 | Ctrl+F: 适应窗口
+                        </div>
+                    </div>
                     </div>
                 </div>
             </div>
