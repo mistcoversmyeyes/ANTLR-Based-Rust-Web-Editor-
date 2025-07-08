@@ -142,12 +142,23 @@ public class ASTGenerator {
                                               AtomicInteger nodeIdCounter, int parentId) {
         int currentNodeId = nodeIdCounter.getAndIncrement();
         
-        // 根据节点类型设置不同颜色
-        String fillColor = node.isTerminal() ? "lightgreen" : "lightcoral";
+        // 根据节点类型设置不同颜色和形状
+        String fillColor, shape, fontColor;
+        if (node.isTerminal()) {
+            // 叶子节点（终端节点）：蓝色填充，白色字体
+            fillColor = "black";
+            shape = "ellipse";
+            fontColor = "white";
+        } else {
+            // 非终端节点：粉红色填充，黑色字体
+            fillColor = "lightcoral";
+            shape = "ellipse";
+            fontColor = "black";
+        }
         String escapedLabel = CSTGenerator.escapeDotLabel(node.getLabel());
         
-        dot.append(String.format("  node%d [label=\"%s\", fillcolor=%s];\n", 
-                                currentNodeId, escapedLabel, fillColor));
+        dot.append(String.format("  node%d [label=\"%s\", fillcolor=%s, shape=%s, fontcolor=%s];\n", 
+                                currentNodeId, escapedLabel, fillColor, shape, fontColor));
         
         if (parentId >= 0) {
             dot.append(String.format("  node%d -> node%d;\n", parentId, currentNodeId));
