@@ -11,7 +11,7 @@ public class WebServer {
                 staticFiles.hostedPath = "/static";
                 staticFiles.directory = "/static";
             });
-        }).start(7070);
+        }).start(7071);
         
         // 配置 CORS
         app.before(ctx -> {
@@ -34,6 +34,6 @@ public class WebServer {
             ctx.json(resultJson);
         });
 
-        System.out.println("WebServer is running on port 7070...");
+        System.out.println("WebServer is running on port 7071...");
     }
 }
