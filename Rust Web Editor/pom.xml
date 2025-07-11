@@ -63,7 +63,34 @@
         <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
         <testSourceDirectory>${project.basedir}/src/test/java</testSourceDirectory>
         
+        <!-- 资源配置：包含静态资源 -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>webapp</directory>
+                <targetPath>static</targetPath>
+            </resource>
+        </resources>
+        
         <plugins>
+            <!-- ANTLR Maven 插件：用于从 .g4 文件生成 Java 代码 (暂时跳过) -->
+            <!--
+            <plugin>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-maven-plugin</artifactId>
+                <version>4.13.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            -->
+
             <!-- Maven Shade 插件：用于构建一个包含所有依赖的 "fat JAR" -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -79,7 +106,7 @@
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <!-- 指定 JAR 的主入口类 -->
-                                    <mainClass>main.java.WebServer.WebServer</mainClass>
+                                    <mainClass>WebServer.WebServer</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

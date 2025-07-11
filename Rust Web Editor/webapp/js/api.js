@@ -5,7 +5,7 @@
 
 class ApiClient {
     constructor() {
-        this.baseUrl = 'http://localhost:7070';
+        this.baseUrl = 'http://localhost:7071';
         this.timeout = 30000; // 30秒超时
         this.retryCount = 3;
         this.retryDelay = 1000;
